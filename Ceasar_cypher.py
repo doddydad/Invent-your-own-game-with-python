@@ -14,9 +14,9 @@ MAX_KEY_SIZE = len(SYMBOLS)
 def getMode():
     # Finds out whether encryting or decrypting
     mode = ""
-    while not mode.lower().startswith(("d", "e")):
-        mode = input("Would you like to encrypt or decrypt a message?: ")
-    return mode.lower()[0]
+    while not mode.startswith(("d", "e", "b")):
+        mode = input("Would you like to encrypt, decrypt or brute force a message?: ").lower()
+    return mode[0]
 
 
 def getMessage():
@@ -58,8 +58,15 @@ def getTranslatedMessage(mode, message, key):
 def main():
     mode = getMode()
     message = getMessage()
-    key = getKey()
-    print(getTranslatedMessage(mode, message, key))
+    if mode != "b":
+        key = getKey()
+        print("\nYour translated text is: ")
+        print(getTranslatedMessage(mode, message, key))
+    if mode == "b":
+        print("\nHere are all the possible shifts\n")
+        i = 1
+        for i in range(MAX_KEY_SIZE):
+            print(getTranslatedMessage(mode, message, i))
 
 
 main()
