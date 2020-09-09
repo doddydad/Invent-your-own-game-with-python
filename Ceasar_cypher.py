@@ -7,6 +7,7 @@ Created on Tue Sep  8 16:03:09 2020
 
 # Caesar cypher
 
+#Please don't add upper cases, message is converted to lower case
 SYMBOLS = "abcdefghijklmnopqrstuvwxyz"
 MAX_KEY_SIZE = len(SYMBOLS)
 
@@ -41,9 +42,11 @@ def getTranslatedMessage(mode, message, key):
     # The only interesting function
     newMessage = ""
 
+    # Decryption is just opposite of encryption
     if mode == "d":
         key = -key
 
+    # This is where it actually shifts the message
     for letter in message:
         if letter in SYMBOLS:
             letterIndex = SYMBOLS.find(letter)
@@ -58,10 +61,15 @@ def getTranslatedMessage(mode, message, key):
 def main():
     mode = getMode()
     message = getMessage()
+
+    # Non brute force
     if mode != "b":
         key = getKey()
         print("\nYour translated text is: ")
         print(getTranslatedMessage(mode, message, key))
+
+    # Cycles through all possible keys. Technically should use frequency
+    # analysis.
     if mode == "b":
         print("\nHere are all the possible shifts\n")
         i = 1

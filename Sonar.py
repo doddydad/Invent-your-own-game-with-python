@@ -17,7 +17,7 @@ def getNewBoard():
     # Width
     for x in range(50):
         board.append([])
-        # Height
+        # the random symbols should make it look better but...
         for y in range(15):
             if random.randint(0, 1) == 0:
                 board[x].append("~")
@@ -33,6 +33,7 @@ def drawBoard(board):
         tensDigitLine += (" " * 9) + str(i)
 
     # Prints the frame of the board
+    # Needs to be manually adjusted if the width changes.
     print(tensDigitLine)
     print("   " + "0123456789" * 5)
     print()
@@ -75,6 +76,8 @@ def makeMove(board, chests, x, y):
     # Makes the move
     smallestDistance = 80
     for cx, cy in chests:
+        # you can use actual distance, but it tends to be less helpful
+        # To do so, use pythag then round to one digit.
         distance = abs(cx-x) + abs(cy-y)
         if distance < smallestDistance:
             smallestDistance = distance
@@ -167,7 +170,7 @@ def main():
                 for [x, y] in previousMoves:
                     if theBoard[x][y] != "X":
                         makeMove(theBoard, theChests, x, y)
-       
+
                 if len(theChests) == 0:
                     print("You won!")
                     again = input("Would you like to play again?(yes/no): ")
