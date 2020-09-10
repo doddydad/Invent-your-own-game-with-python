@@ -35,6 +35,8 @@ def getNewBoard():
     board = []
     for i in range(HEIGHT):
         board.append([" ", " ", " ", " ", " ", " ", " ", " "])
+    board[3][4] = board[4][3] = "X"
+    board[3][3] = board[4][4] = "O"
     return board
 
 
@@ -61,16 +63,13 @@ def isValidMove(board, tile, xstart, ystart):
     for xdirection, ydirection in [[0, 1], [1, 1], [1, 0], [1, -1],
                                    [0, -1], [-1, -1], [-1, 0], [-1, 1]]:
         # Checks each direction from the potential move
-        x = xstart + xdirection
-        y = ystart + ydirection
+        x = xstart
+        y = ystart
 
         # Record captures in te current direction only
         potentialCaptures = []
 
-        while isOnBoard(x, y) and board[x][y] == otherTile:
-
-            x += xdirection
-            y += ydirection
+        while isOnBoard(x, y) and board[x][y] != tile:
 
             # Adds tiles to be captured if the line is surrounded
             if board[x][y] == otherTile:
@@ -78,8 +77,13 @@ def isValidMove(board, tile, xstart, ystart):
 
             # This records what will be captured
             if board[x][y] == tile and potentialCaptures != []:
+                print(potentialCaptures)
                 for [x, y] in potentialCaptures:
                     captures.append([x, y])
+                    break
+
+            x += xdirection
+            y += ydirection
 
     if captures != []:
         return captures
@@ -128,8 +132,60 @@ def enterPlayerChoice():
     return playerTile
 
 
+def makeMove(board, tile, x, y):
+    # Place the tile at [xstart, ystart] and flip the pieces.
+    captures = isValidMove(board, tile, x, y)
 
-print(enterPlayerChoice())
+    if captures is False:
+        return False
+
+    board[x][y] = tile
+    for [x, y] in captures:
+        board[x][y] = tile
+    return True
 
 
+def isOnCorner(x, y):
+    # Checks if coordinates are in a corner
+    if [x, y] in ([0, 0], [0, HEIGHT - 1], [WIDTH - 1, HEIGHT - 1],
+                  [WIDTH - 1, 0]):
+        return True
+    return False
 
+
+def getPlayerMove(board, playerTile):
+    # Takes the players move or command for hints or to quit
+    while True:
+        print("Please enter your move as XY, or ask for hints or to quit: ")
+        x = ""
+        y = ""
+        playerMove = input().lower()
+
+        if playerMove.startswith("q"):
+            print("Thanks for playing")
+            sys.exit()
+
+        elif playerMove.startswith("h"):
+            drawBoard(boardWithValidMoves(board, playerTile))
+
+        try:
+            x = playerMove[0]
+            y = playerMove[1]
+        except IndexError:
+            True
+
+        try:
+            x = int(x) - 1
+            y = int(y) - 1
+        except ValueError:
+            playerMove = playerMove
+
+        if x in range(8) and y in range(8):
+            if isValidMove(board, playerTile, x, y) is True:
+                break
+
+    return [x, y]
+
+
+drawBoard(getNewBoard())
+getPlayerMove(getNewBoard(), "X")
