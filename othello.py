@@ -69,10 +69,11 @@ def isValidMove(board, tile, xstart, ystart):
         # Record captures in te current direction only
         potentialCaptures = []
 
-        while isOnBoard(x, y) and board[x][y] != tile:
+        while isOnBoard(x, y) and board[x][y] != " ":
 
             # Adds tiles to be captured if the line is surrounded
             if board[x][y] == otherTile:
+                print("lol")
                 potentialCaptures.append([x, y])
 
             # This records what will be captured
@@ -169,14 +170,10 @@ def getPlayerMove(board, playerTile):
             drawBoard(boardWithValidMoves(board, playerTile))
 
         try:
-            x = playerMove[0]
-            y = playerMove[1]
+            x = int(playerMove[0]) - 1
+            y = int(playerMove[1]) - 1
         except IndexError:
             True
-
-        try:
-            x = int(x) - 1
-            y = int(y) - 1
         except ValueError:
             playerMove = playerMove
 
@@ -186,6 +183,6 @@ def getPlayerMove(board, playerTile):
 
     return [x, y]
 
-
-drawBoard(getNewBoard())
-getPlayerMove(getNewBoard(), "X")
+board = getNewBoard()
+drawBoard(board)
+getPlayerMove(board, "X")
