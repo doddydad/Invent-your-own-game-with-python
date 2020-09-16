@@ -107,6 +107,16 @@ def getValidMoves(board, tile):
     return validMoves
 
 
+def getBoardCopy(board):
+    boardCopy = getNewBoard()
+
+    for x in range(WIDTH):
+        for y in range(HEIGHT):
+            boardCopy[x][y] = board[x][y]
+
+    return boardCopy
+
+
 def getScoreOnBoard(board):
     # Totals the score by tile
     xscore = 0
@@ -164,7 +174,7 @@ def getPlayerMove(board, playerTile):
         y = ""
         playerMove = input().lower()
 
-        if playerMove.startswith("q" "h"):
+        if playerMove.startswith(("q", "h")):
             return playerMove[0]
 
         if len(playerMove) == 2:
@@ -207,8 +217,8 @@ def getComputerMove(board, computerTile):
 
     bestscore = 0
     for x, y in possibleMoves:
-        boardCopy = board
-        makeMove(board, computerTile, x, y)
+        boardCopy = getBoardCopy(board)
+        makeMove(boardCopy, computerTile, x, y)
         score = getScoreOnBoard(boardCopy)[computerTile]
         if score > bestscore:
             print("score: %s and place %s %s" % (score, x, y))
@@ -253,8 +263,9 @@ def playGame(playerTile, computerTile):
 
                 if move == "h":
                     showHints = not showHints
+                    continue
 
-                if move == "q":
+                elif move == "q":
                     print("Thanks for playing")
                     sys.exit()
 
@@ -269,6 +280,8 @@ def playGame(playerTile, computerTile):
 
                 input("Press enter to make the computer move")
                 move = getComputerMove(board, computerTile)
+                print("computer move", move)
+                drawBoard(board)
                 makeMove(board, computerTile, move[0], move[1])
                 turn = "player"
 
