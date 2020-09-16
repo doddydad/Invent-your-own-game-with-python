@@ -48,55 +48,45 @@ def isOnBoard(x, y):
 
 
 def isValidMove(board, tile, xstart, ystart):
-    # Return false if player's move is invalid
-    # If valid return a list of spaces that will be captured.
+    # Return False if the players move is invalid, otherise return
+    # where they'll capture
 
-    # checks if the tile already has something in it
-    if board[xstart][ystart] != " ":
-        print(xstart, ystart, "is already filled")
+    # Checks it would be possible to place a piece here
+    if board[xstart][ystart] != " " or not isOnBoard(xstart, ystart):
         return False
 
-    captures = []
     if tile == "X":
         otherTile = "O"
     else:
         otherTile = "X"
 
+    captures = []
+
     for xdirection, ydirection in [[0, 1], [1, 1], [1, 0], [1, -1],
                                    [0, -1], [-1, -1], [-1, 0], [-1, 1]]:
-        # Checks each direction from the potential move
-        x = xstart
-        y = ystart
-        i = 0
+        # We've already checked the placement is ok
+        x, y = xstart, ystart
+        x += xdirection
+        y += ydirection
 
-        # Record captures in te current direction only
-        potentialCaptures = []
-
-        # We want to check that
-        while isOnBoard(x, y) and board[x][y] != tile:
-
-            # Adds tiles to be captured if the line is surrounded
-            if board[x][y] == otherTile:
-                potentialCaptures.append([x, y])
-
-            if board[x][y] == " " and i != 0:
-                print("%s, %s going %s %s hit empty" % (xstart, ystart, xdirection, ydirection))
-                break
-            
+        # We check it goes over the other player's tiles
+        while isOnBoard(x, y) and board[x][y] == otherTile:
             x += xdirection
             y += ydirection
-            i += 1
 
-        if board[x][y] == tile and potentialCaptures != [] and isOnBoard(x, y):
-                print(potentialCaptures)
-                print(captures)
-                for [x, y] in potentialCaptures:
+            # Record the captures in this direction
+            if isOnBoard(x, y) and board[x][y] == tile:
+                while True:
+                    x -= xdirection
+                    y -= ydirection
+                    if x == xstart and y == ystart:
+                        break
                     captures.append([x, y])
 
-    print("Exit")
-    if captures != []:
-        return captures
-    return False
+    # No captures means invalid move remember
+    if len(captures) == 0:
+        return False
+    return captures
 
 
 def boardWithValidMoves(board, tile):
@@ -138,11 +128,15 @@ def enterPlayerChoice():
     print("Would you like the X or O tile?(type in your answer): ")
     while playerTile not in ("X", "O"):
         playerTile = input().upper()
-    return playerTile
+
+    if playerTile == "X":
+        return ["X", "O"]
+    else:
+        return ["O", "X"]
 
 
 def makeMove(board, tile, x, y):
-    # Place the tile at [xstart, ystart] and flip the pieces.
+    # Place the tile at [x, y] and flip the pieces.
     captures = isValidMove(board, tile, x, y)
 
     if captures is False:
@@ -170,12 +164,8 @@ def getPlayerMove(board, playerTile):
         y = ""
         playerMove = input().lower()
 
-        if playerMove.startswith("q"):
-            print("Thanks for playing")
-            sys.exit()
-
-        elif playerMove.startswith("h"):
-            drawBoard(boardWithValidMoves(board, playerTile))
+        if playerMove.startswith("q" "h"):
+            return playerMove[0]
 
         if len(playerMove) == 2:
             try:
@@ -187,14 +177,128 @@ def getPlayerMove(board, playerTile):
                 playerMove = playerMove
 
             if x in range(8) and y in range(8):
-                if isValidMove(board, playerTile, x, y) is True:
-                    return [x, y]
+                if isValidMove(board, playerTile, x, y) is not False:
+                    break
                 else:
-                    print("Sorry that move isn't valid")
+                    continue
+
+            else:
+                print("Thats not a valid move")
+
+    return [x, y]
+
+
+def whoGoesFirst():
+    # Randomly choose who goes first
+    if random.randint(0, 1) == 0:
+        return "computer"
+    else:
+        return "player"
+
+
+def getComputerMove(board, computerTile):
+    # Determine where to move by corners > best score
+    possibleMoves = getValidMoves(board, computerTile)
+    random.shuffle(possibleMoves)
+
+    for x, y in possibleMoves:
+        if isOnCorner(x, y):
+            return [x, y]
+
+    bestscore = 0
+    for x, y in possibleMoves:
+        boardCopy = board
+        makeMove(board, computerTile, x, y)
+        score = getScoreOnBoard(boardCopy)[computerTile]
+        if score > bestscore:
+            print("score: %s and place %s %s" % (score, x, y))
+            bestmove = [x, y]
+            bestscore = score
+
+    return bestmove
+
+
+def printScore(board, playerTile, computerTile):
+    scores = getScoreOnBoard(board)
+    print("You: %s points. Computer: %s points" % (scores[playerTile],
+                                                   scores[computerTile]))
+
+
+def playGame(playerTile, computerTile):
+    showHints = False
+    turn = whoGoesFirst()
+    print("The", turn, "will go first")
+
+    board = getNewBoard()
+
+    while True:
+        playerValidMoves = getValidMoves(board, playerTile)
+        computerValidMoves = getValidMoves(board, computerTile)
+
+        # Check stalemate condition
+        if computerValidMoves == [] or playerValidMoves == []:
+            return board
+
+        elif turn == "player":
+            if playerValidMoves != []:
+                # This block shows the board
+                if showHints:
+                    validMovesBoard = boardWithValidMoves(board, playerTile)
+                    drawBoard(validMovesBoard)
+                else:
+                    drawBoard(board)
+                printScore(board, playerTile, computerTile)
+
+                move = getPlayerMove(board, playerTile)
+
+                if move == "h":
+                    showHints = not showHints
+
+                if move == "q":
+                    print("Thanks for playing")
+                    sys.exit()
+
+                else:
+                    makeMove(board, playerTile, move[0], move[1])
+            turn = "computer"
+
+        elif turn == "computer":
+            if computerValidMoves != []:
+                drawBoard(board)
+                printScore(board, playerTile, computerTile)
+
+                input("Press enter to make the computer move")
+                move = getComputerMove(board, computerTile)
+                makeMove(board, computerTile, move[0], move[1])
+                turn = "player"
+
+
+def main():
+    print("Othello")
+
+    playerTile, computerTile = enterPlayerChoice()
+
+    while True:
+        finalBoard = playGame(playerTile, computerTile)
+
+        # Wrap up the end of the game
+        drawBoard(finalBoard)
+        scores = getScoreOnBoard(finalBoard)
+        print("X scored %s points and O scored %s points!" % (scores["X"],
+                                                              scores["O"]))
+
+        if scores[playerTile] > scores[computerTile]:
+            print("Congratulations you won")
+
+        elif scores[computerTile] > scores[playerTile]:
+            print("Bad luck you lost")
+
         else:
-            print("Enter a 2 digit number or hint or quit")
+            print("It was a tie")
+
+        print("Do you want to play again?")
+        if not input().lower().startswith("y"):
+            break
 
 
-board = getNewBoard()
-drawBoard(board)
-print(getPlayerMove(board, "X"))
+main()
