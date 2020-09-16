@@ -91,7 +91,7 @@ def isValidMove(board, tile, xstart, ystart):
 
 def boardWithValidMoves(board, tile):
     # Show the board with hint spots showing all valid moves
-    boardCopy = board
+    boardCopy = getBoardCopy(board)
     for x, y in getValidMoves(board, tile):
         boardCopy[x][y] = "."
     return boardCopy
