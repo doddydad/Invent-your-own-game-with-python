@@ -51,7 +51,9 @@ def isValidMove(board, tile, xstart, ystart):
     # Return false if player's move is invalid
     # If valid return a list of spaces that will be captured.
 
+    # checks if the tile already has something in it
     if board[xstart][ystart] != " ":
+        print(xstart, ystart, "is already filled")
         return False
 
     captures = []
@@ -65,27 +67,33 @@ def isValidMove(board, tile, xstart, ystart):
         # Checks each direction from the potential move
         x = xstart
         y = ystart
+        i = 0
 
         # Record captures in te current direction only
         potentialCaptures = []
 
-        while isOnBoard(x, y) and board[x][y] != " ":
+        # We want to check that
+        while isOnBoard(x, y) and board[x][y] != tile:
 
             # Adds tiles to be captured if the line is surrounded
             if board[x][y] == otherTile:
-                print("lol")
                 potentialCaptures.append([x, y])
 
-            # This records what will be captured
-            if board[x][y] == tile and potentialCaptures != []:
-                print(potentialCaptures)
-                for [x, y] in potentialCaptures:
-                    captures.append([x, y])
-                    break
-
+            if board[x][y] == " " and i != 0:
+                print("%s, %s going %s %s hit empty" % (xstart, ystart, xdirection, ydirection))
+                break
+            
             x += xdirection
             y += ydirection
+            i += 1
 
+        if board[x][y] == tile and potentialCaptures != [] and isOnBoard(x, y):
+                print(potentialCaptures)
+                print(captures)
+                for [x, y] in potentialCaptures:
+                    captures.append([x, y])
+
+    print("Exit")
     if captures != []:
         return captures
     return False
@@ -169,20 +177,24 @@ def getPlayerMove(board, playerTile):
         elif playerMove.startswith("h"):
             drawBoard(boardWithValidMoves(board, playerTile))
 
-        try:
-            x = int(playerMove[0]) - 1
-            y = int(playerMove[1]) - 1
-        except IndexError:
-            True
-        except ValueError:
-            playerMove = playerMove
+        if len(playerMove) == 2:
+            try:
+                x = int(playerMove[0]) - 1
+                y = int(playerMove[1]) - 1
+            except IndexError:
+                True
+            except ValueError:
+                playerMove = playerMove
 
-        if x in range(8) and y in range(8):
-            if isValidMove(board, playerTile, x, y) is True:
-                break
+            if x in range(8) and y in range(8):
+                if isValidMove(board, playerTile, x, y) is True:
+                    return [x, y]
+                else:
+                    print("Sorry that move isn't valid")
+        else:
+            print("Enter a 2 digit number or hint or quit")
 
-    return [x, y]
 
 board = getNewBoard()
 drawBoard(board)
-getPlayerMove(board, "X")
+print(getPlayerMove(board, "X"))
