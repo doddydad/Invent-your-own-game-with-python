@@ -14,20 +14,43 @@ HEIGHT = 8
 WIDTH = 8
 
 
+def giveInstructions():
+    # How to play for the player
+    drawBoard(getNewBoard())
+    print(
+"""In this game you'll be playing on a board like the one above
+you will pick  a piece to play with and place pieces to
+capture your opponents. You enter the place you would like
+to play by entering the co-ordinates of the position along
+then down. You capture a line of their pieces if the one
+you place means their lines has one of your pieces at each
+end. You must place your pieces each turn such that they
+capture at least one piece. The game ends when either player
+can not make a legal move. The winner is the player who at the
+end of the game has most pieces on the board.
+
+You can quit at any time, and asking for hints will mark
+legal moves for you with a \".\"
+""")
+
+
 def drawBoard(board):
     # Draws an already created board
-    print("   12345678")
-    print("  +--------+")
+    print("   1 2 3 4 5 6 7 8")
+    print("  +---------------+")
 
     # Writes in each tile
     for y in range(HEIGHT):
         print(" %s|" % (y+1), end="")
         for x in range(WIDTH):
-            print(board[x][y], end="")
+            if x != 7:
+                print(board[x][y], end=" ")
+            elif x == 7:
+                print(board[x][y], end="")
         print("|%s\n" % (y+1), end="")
 
-    print("  +--------+")
-    print("   12345678")
+    print("  +---------------+")
+    print("   1 2 3 4 5 6 7 8")
 
 
 def getNewBoard():
@@ -235,6 +258,7 @@ def printScore(board, playerTile, computerTile):
 
 
 def playGame(playerTile, computerTile):
+    # Playing the game and taking turns
     showHints = False
     turn = whoGoesFirst()
     print("The", turn, "will go first")
@@ -288,6 +312,7 @@ def playGame(playerTile, computerTile):
 
 def main():
     print("Othello")
+    giveInstructions()
 
     playerTile, computerTile = enterPlayerChoice()
 
