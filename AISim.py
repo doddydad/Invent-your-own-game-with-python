@@ -39,6 +39,7 @@ legal moves for you with a \".\"
 
 def drawBoard(board):
     # Draws an already created board
+    # Not used in AI v AI
     print("   1 2 3 4 5 6 7 8")
     print("  +---------------+")
 
@@ -117,6 +118,7 @@ def isValidMove(board, tile, xstart, ystart):
 
 def boardWithValidMoves(board, tile):
     # Show the board with hint spots showing all valid moves
+    # Not used in AI v AI
     boardCopy = getBoardCopy(board)
     for x, y in getValidMoves(board, tile):
         boardCopy[x][y] = "."

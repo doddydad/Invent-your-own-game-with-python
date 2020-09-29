@@ -18,7 +18,7 @@ def giveInstructions():
     # How to play for the player
     drawBoard(getNewBoard())
     print(
-"""In this game you'll be playing on a board like the one above
+        """In this game you'll be playing on a board like the one above
 you will pick  a piece to play with and place pieces to
 capture your opponents. You enter the place you would like
 to play by entering the co-ordinates of the position along
