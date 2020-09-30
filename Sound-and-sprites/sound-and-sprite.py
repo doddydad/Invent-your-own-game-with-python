@@ -46,8 +46,9 @@ player_stretched_image = pygame.transform.scale(player_image, (player_size,
 MOVESPEED = 4
 
 # Music setup
-pick_up_sound = pygame.mixer.Sound("beep.wav")
+pick_up_sound = pygame.mixer.Sound("Kiss.wav")
 pygame.mixer.music.load("froge.mp3")
+pygame.mixer.music.set_volume(0.3)
 pygame.mixer.music.play(-1, 0.0)
 music_playing = True
 
